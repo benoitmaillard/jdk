@@ -877,7 +877,7 @@ Node_Notes* Parse::make_node_notes(Node_Notes* caller_nn) {
 void Compile::return_values(JVMState* jvms) {
   GraphKit kit(jvms);
   // Node* control = kit.control();
-  Node* test = kit.make_debug_print("hello world!");
+  Node* test = kit.make_debug_print("hello world!\n");
 
   // Node* test = new ModFNode(this, nullptr, nullptr); // this works
   // test->dump(); // this works now
