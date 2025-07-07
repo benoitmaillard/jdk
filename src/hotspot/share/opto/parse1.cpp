@@ -876,16 +876,17 @@ Node_Notes* Parse::make_node_notes(Node_Notes* caller_nn) {
 //--------------------------return_values--------------------------------------
 void Compile::return_values(JVMState* jvms) {
   GraphKit kit(jvms);
-  Node* test = new DebugPrintNode("hello world!");
+  // Node* control = kit.control();
+  Node* test = kit.make_debug_print("hello world!");
 
   // Node* test = new ModFNode(this, nullptr, nullptr); // this works
-  test->dump(); // this works now
-
-  test->init_req(0, kit.control());
+  // test->dump(); // this works now
+  // kit.control()->dump();
+  // test->set_req(TypeFunc::Control, control); // this is useless
 
   Node* ret = new ReturnNode(TypeFunc::Parms,
                              // kit.control(),
-                             test,
+                             kit.control(),
                              kit.i_o(),
                              kit.reset_memory(),
                              kit.frameptr(),
