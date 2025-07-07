@@ -212,6 +212,7 @@ class OptoRuntime : public AllStatic {
 #endif // INCLUDE_JVMTI
   static const TypeFunc* _dtrace_method_entry_exit_Type;
   static const TypeFunc* _dtrace_object_alloc_Type;
+  static const TypeFunc* _debug_print_Type;
 
   // Stub names indexed by sharedStubId
   static const char *_stub_names[];
@@ -751,6 +752,11 @@ private:
   static inline const TypeFunc* dtrace_object_alloc_Type() {
     assert(_dtrace_object_alloc_Type != nullptr, "should be initialized");
     return _dtrace_object_alloc_Type;
+  }
+
+  static inline const TypeFunc* debug_print_Type() {
+    assert(_debug_print_Type != nullptr, "should be initialized");
+    return _debug_print_Type;
   }
 
  private:
