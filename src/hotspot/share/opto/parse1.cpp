@@ -876,8 +876,16 @@ Node_Notes* Parse::make_node_notes(Node_Notes* caller_nn) {
 //--------------------------return_values--------------------------------------
 void Compile::return_values(JVMState* jvms) {
   GraphKit kit(jvms);
+  Node* test = new DebugPrintNode("hello world!");
+
+  // Node* test = new ModFNode(this, nullptr, nullptr); // this works
+  test->dump(); // this works now
+
+  test->init_req(0, kit.control());
+
   Node* ret = new ReturnNode(TypeFunc::Parms,
-                             kit.control(),
+                             // kit.control(),
+                             test,
                              kit.i_o(),
                              kit.reset_memory(),
                              kit.frameptr(),
@@ -892,6 +900,10 @@ void Compile::return_values(JVMState* jvms) {
   }
   // bind it to root
   root()->add_req(ret);
+
+  record_for_igvn(test);
+  initial_gvn()->transform(test);
+
   record_for_igvn(ret);
   initial_gvn()->transform(ret);
 }
