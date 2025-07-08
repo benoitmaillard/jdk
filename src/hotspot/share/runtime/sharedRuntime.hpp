@@ -142,6 +142,8 @@ class SharedRuntime: AllStatic {
   // TODO probably not the right location, let's move it later
   static void debug_print(const char* msg, int arg);
 
+  static void debug_printf(const char* format, ...);
+
 
 #ifdef _WIN64
   // Workaround for fmod issue in the Windows x64 CRT
