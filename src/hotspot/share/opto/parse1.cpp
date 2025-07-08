@@ -877,7 +877,18 @@ Node_Notes* Parse::make_node_notes(Node_Notes* caller_nn) {
 void Compile::return_values(JVMState* jvms) {
   GraphKit kit(jvms);
   // Node* control = kit.control();
-  Node* test = kit.make_debug_print("hello world!\n");
+
+  // TODO conditions should be:
+  // 1) there is a return value
+  // 2) its type is int (how exactly do we enforce that?)
+
+  int ret_size = tf()->range()->cnt() - TypeFunc::Parms;
+  const Type* return_type = tf()->range()->field_at(TypeFunc::Parms);
+  if (ret_size == 1 && return_type->isa_int()) {
+    Node* test = kit.make_debug_print("value is:", kit.argument(-1));
+    record_for_igvn(test);
+    initial_gvn()->transform(test);
+  }
 
   // Node* test = new ModFNode(this, nullptr, nullptr); // this works
   // test->dump(); // this works now
@@ -892,7 +903,7 @@ void Compile::return_values(JVMState* jvms) {
                              kit.frameptr(),
                              kit.returnadr());
   // Add zero or 1 return values
-  int ret_size = tf()->range()->cnt() - TypeFunc::Parms;
+  // int ret_size = tf()->range()->cnt() - TypeFunc::Parms;
   if (ret_size > 0) {
     kit.inc_sp(-ret_size);  // pop the return value(s)
     kit.sync_jvms();
@@ -901,9 +912,6 @@ void Compile::return_values(JVMState* jvms) {
   }
   // bind it to root
   root()->add_req(ret);
-
-  record_for_igvn(test);
-  initial_gvn()->transform(test);
 
   record_for_igvn(ret);
   initial_gvn()->transform(ret);
