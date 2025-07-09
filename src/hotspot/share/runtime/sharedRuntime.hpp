@@ -25,6 +25,7 @@
 #ifndef SHARE_RUNTIME_SHAREDRUNTIME_HPP
 #define SHARE_RUNTIME_SHAREDRUNTIME_HPP
 
+#include "safepointVerifiers.hpp"
 #include "classfile/compactHashtable.hpp"
 #include "code/codeBlob.hpp"
 #include "code/vmreg.hpp"
@@ -143,6 +144,23 @@ class SharedRuntime: AllStatic {
   static void debug_print(const char* msg, int arg);
 
   static void debug_printf(const char* format, ...);
+
+  template <typename... TT>
+  static void debug_print_tt(const char *format, TT... args) {
+    DEBUG_ONLY(NoHandleMark __hm;)
+    os::verify_stack_alignment();
+    DEBUG_ONLY(NoSafepointVerifier __nsv;)
+
+    debug_print_t(format, args...);
+  }
+
+  template <typename T, typename... Rest>
+  static void debug_print_t(const char* format, T arg, Rest... args) {
+    tty->print_cr("value: %d\n", arg); // TODO %d might not always be suitable
+    debug_print_t(format, args...);
+  }
+
+  static void debug_print_t(const char* format) {}
 
 
 #ifdef _WIN64
