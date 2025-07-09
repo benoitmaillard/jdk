@@ -151,16 +151,19 @@ class SharedRuntime: AllStatic {
     os::verify_stack_alignment();
     DEBUG_ONLY(NoSafepointVerifier __nsv;)
 
-    debug_print_t(format, args...);
+    tty->print("%s", format);
+    debug_print_t(args...);
+    tty->print_cr("");
   }
 
   template <typename T, typename... Rest>
-  static void debug_print_t(const char* format, T arg, Rest... args) {
-    tty->print_cr("value: %d\n", arg); // TODO %d might not always be suitable
-    debug_print_t(format, args...);
+  static void debug_print_t(T arg, Rest... args) {
+    // TODO we could use a polymorphic function here to have a different behavior depending on type
+    tty->print("[%d] ", arg);
+    debug_print_t(args...);
   }
 
-  static void debug_print_t(const char* format) {}
+  static void debug_print_t() {}
 
 
 #ifdef _WIN64
