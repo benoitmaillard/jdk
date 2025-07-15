@@ -885,9 +885,33 @@ void Compile::return_values(JVMState* jvms) {
   int ret_size = tf()->range()->cnt() - TypeFunc::Parms;
   const Type* return_type = tf()->range()->field_at(TypeFunc::Parms);
   if (ret_size == 1 && return_type->isa_int()) {
-    Node* test = kit.make_debug_print("value is:", kit.argument(-1));
-    record_for_igvn(test);
-    initial_gvn()->transform(test);
+    Node* return_value = kit.argument(-1);
+
+    StartNode* start_node = start();
+    for (DUIterator_Fast imax, i = start_node->fast_outs(imax); i < imax; i++) {
+      Node* user = start_node->fast_out(i);
+      if (user->is_Parm()) {
+        Node* test = nullptr;
+        if (user->bottom_type()->isa_int()) {
+          test = kit.make_debug_print<jint, jint>("dumping values: ", return_value, user);
+        } else if (user->bottom_type()->isa_double()) {
+          i++;
+          Node* half = start_node->fast_out(i);
+          test = kit.make_debug_print<jint, jdouble, jint>("dumping values: ", return_value, user, half);
+        } else if (user->bottom_type()->isa_float()) {
+          test = kit.make_debug_print<jint, jfloat>("dumping values: ", return_value, user);
+        } else if (user->bottom_type()->isa_long()) {
+          i++;
+          Node* half = start_node->fast_out(i);
+          test = kit.make_debug_print<jint, jlong>("dumping values: ", return_value, user, half);
+        }
+
+        if (test != nullptr) {
+          record_for_igvn(test);
+          initial_gvn()->transform(test);
+        }
+      }
+    }
   }
 
   // Node* test = new ModFNode(this, nullptr, nullptr); // this works
