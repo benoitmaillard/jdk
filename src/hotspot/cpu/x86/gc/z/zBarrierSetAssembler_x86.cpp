@@ -360,8 +360,13 @@ static void emit_store_fast_path_check(MacroAssembler* masm, Address ref_addr, b
     // an atomic operation can execute.
     // A not relocatable object could have spurious raw null pointers in its fields after
     // getting promoted to the old generation.
-    __ cmpw(ref_addr, barrier_Relocation::unpatched);
+    assert_different_registers(ref_addr.base(), rscratch2);
+    // push(rscratch2); // TODO do we need this?
+    __ xorl(rscratch2, rscratch2); // TODO do we need this?
+    __ movw(rscratch2, ref_addr);
+    __ cmpl_imm32(rscratch2, barrier_Relocation::unpatched);
     __ relocate(barrier_Relocation::spec(), ZBarrierRelocationFormatStoreGoodAfterCmp);
+    // pop(rscratch2); // TODO do we need this?
   } else {
     // Stores on relocatable objects never need to deal with raw null pointers in fields.
     // Raw null pointers may only exist in the young generation, as they get pruned when
@@ -1337,7 +1342,7 @@ static int patch_barrier_relocation_offset(int format) {
     return 3;
 
   case ZBarrierRelocationFormatStoreGoodAfterCmp:
-    return -2;
+    return -4;
 
   case ZBarrierRelocationFormatLoadBadAfterTest:
   case ZBarrierRelocationFormatMarkBadAfterTest:
