@@ -1231,6 +1231,7 @@ private:
   void cmpl(Register dst, Register src);
   void cmpl(Register dst, Address src);
   void cmpl_imm32(Address dst, int32_t imm32);
+  void cmpl_imm32(Register dst, int32_t imm32);
   void cmpl(Address dst,  Register reg);
 
   void cmpq(Address dst, int32_t imm32);

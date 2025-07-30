@@ -1893,6 +1893,11 @@ void Assembler::cmpl_imm32(Address dst, int32_t imm32) {
   emit_arith_operand_imm32(0x81, as_Register(7), dst, imm32);
 }
 
+void Assembler::cmpl_imm32(Register dst, int32_t imm32) {
+  prefix(dst);
+  emit_arith_imm32(0x81, 0xF8, dst, imm32);
+}
+
 void Assembler::cmpw(Address dst, int imm16) {
   InstructionMark im(this);
   emit_int8(0x66);
